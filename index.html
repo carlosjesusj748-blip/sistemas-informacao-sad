@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas de Informação — Mapa Mental, Diagrama e Infográficos | UFBA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI Emoji', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #e0e7ff 100%);
+    color: #1e293b;
+    line-height: 1.6;
+    padding: 20px;
+    padding-top: 100px;
+    font-size: 18px; /* Fonte base aumentada */
+  }
+
+  .container { max-width: 1700px; margin: 0 auto; }
+
+  /* ===== PROGRESSO ===== */
+  .progress {
+    position: fixed; top: 0; left: 0;
+    height: 5px; width: 0%;
+    background: linear-gradient(90deg, #2563eb, #8b5cf6, #ec4899, #f59e0b, #10b981);
+    z-index: 9999;
+    transition: width 0.1s;
+  }
+
+  /* ===== ÍNDICE FIXO ===== */
+  .indice {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(15px);
+    border-radius: 50px;
+    padding: 12px 24px;
+    box-shadow: 0 8px 30px rgba(30,58,138,0.2);
+    z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(37,99,235,0.15);
+    max-width: calc(100% - 40px);
+  }
+
+  .indice-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding-right: 16px;
+    border-right: 2px solid #e2e8f0;
+    margin-right: 8px;
+    font-weight: 800;
+    color: #1e3a8a;
+    font-size: 1em;
+    white-space: nowrap;
+  }
+
+  .indice-logo .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2em;
+  }
+
+  .indice-links {
+    display: flex; gap: 6px;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .indice-links::-webkit-scrollbar { display: none; }
+
+  .indice-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #1e293b;
+    font-size: 0.95em;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.25s;
+  }
+
+  .indice-link:hover { background: #dbeafe; color: #1e3a8a; }
+  .indice-link.active {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+  }
+
+  /* ===== BOTÃO TOPO ===== */
+  .btn-topo {
+    position: fixed; bottom: 30px; right: 30px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white; border: none;
+    font-size: 1.5em; cursor: pointer;
+    box-shadow: 0 8px 25px rgba(30,58,138,0.4);
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+
+  .btn-topo.visivel { opacity: 1; visibility: visible; }
+  .btn-topo::after { content: '↑'; font-weight: bold; }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+    border-radius: 20px;
+    padding: 32px 40px;
+    margin-bottom: 30px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    box-shadow: 0 15px 40px rgba(30,64,175,0.3);
+  }
+
+  .header-left h1 { font-size: 1.8em; margin-bottom: 6px; }
+  .header-left h2 { font-size: 1.15em; font-weight: 500; opacity: 0.95; }
+
+  .header-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-width: 380px;
+  }
+
+  .info-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border-left: 5px solid #fbbf24;
+  }
+
+  .info-card h4 {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+  }
+
+  .info-card p { font-size: 1em; font-weight: 600; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border-left: 8px solid #2563eb;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    scroll-margin-top: 100px;
+  }
+
+  .section-title .num {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4em; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .section-title h2 { font-size: 1.4em; margin-bottom: 4px; }
+  .section-title p { font-size: 1em; color: #64748b; }
+
+  /* ===== CONTROLES ===== */
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 14px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    flex-wrap: wrap;
+  }
+
+  .controls button {
+    background: white;
+    border: 2px solid #cbd5e1;
+    color: #1e3a8a;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .controls button:hover {
+    background: #1e3a8a;
+    color: white;
+    border-color: #1e3a8a;
+  }
+
+  .zoom-level {
+    font-weight: 800;
+    min-width: 70px;
+    text-align: center;
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 1.05em;
+    border: 2px solid #cbd5e1;
+  }
+
+  /* ==================== MAPA MENTAL ==================== */
+  .mm-viewport {
+    position: relative;
+    width: 100%;
+    height: 900px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    cursor: grab;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+  }
+
+  .mm-viewport.grabbing { cursor: grabbing; }
+
+  .mm-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 3200px;
+    height: 2200px;
+    transform-origin: 0 0;
+    transition: transform 0.15s ease;
+  }
+
+  .mm-viewport.grabbing .mm-canvas { transition: none; }
+
+  .mm-center {
+    position: absolute;
+    top: 1100px; left: 1600px;
+    transform: translate(-50%, -50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(circle at 35% 30%, #1e40af, #0f2a5c 75%);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    box-shadow:
+      0 20px 60px rgba(30,58,138,0.45),
+      0 0 0 14px rgba(37,99,235,0.12),
+      0 0 0 32px rgba(37,99,235,0.05);
+    z-index: 30;
+  }
+
+  .mm-center .icon { font-size: 2.8em; margin-bottom: 12px; }
+  .mm-center h2 { font-size: 1.5em; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+  .mm-center p { font-size: 1em; line-height: 1.4; opacity: 0.95; }
+  .mm-center .fonte { font-size: 0.8em; opacity: 0.8; margin-top: 12px; font-style: italic; }
+
+  .branch-pill, .sub-node { cursor: pointer; outline: none; }
+  .branch-pill:focus, .sub-node:focus { outline: 4px solid #fbbf24; outline-offset: 3px; }
+
+  .branch-pill {
+    position: absolute;
+    padding: 14px 26px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 800;
+    font-size: 1.1em; /* AUMENTADO */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s;
+  }
+
+  .branch-pill:hover { transform: translate(-50%, -50%) scale(1.08); z-index: 40; }
+
+  .sub-node {
+    position: absolute;
+    background: white;
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1em; /* AUMENTADO */
+    line-height: 1.4;
+    color: #1e293b;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    border-left: 6px solid;
+    max-width: 300px;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .sub-node:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    z-index: 40;
+  }
+
+  .sub-node strong { display: block; font-size: 1.2em; font-weight: 800; margin-bottom: 6px; }
+  .sub-node .desc { font-size: 1.05em; color: #475569; display: block; }
+  .sub-node ul { list-style: none; margin-top: 6px; }
+  .sub-node li { padding: 3px 0 3px 16px; position: relative; color: #334155; font-size: 1.05em; font-weight: 500; }
+  .sub-node li::before { content: '•'; position: absolute; left: 2px; font-weight: bold; font-size: 1.3em; }
+
+  .c-dim { background: #f59e0b; } .c-niv { background: #ec4899; } .c-int { background: #06b6d4; }
+  .c-tec { background: #f97316; } .c-abr { background: #db2777; } .c-gc { background: #14b8a6; }
+  .c-tap { background: #8b5cf6; } .c-ato { background: #10b981; }
+
+  .b-dim { border-color: #f59e0b; } .b-niv { border-color: #ec4899; } .b-int { border-color: #06b6d4; }
+  .b-tec { border-color: #f97316; } .b-abr { border-color: #db2777; } .b-gc { border-color: #14b8a6; }
+  .b-tap { border-color: #8b5cf6; } .b-ato { border-color: #10b981; }
+
+  .b-dim strong, .b-dim li::before { color: #b45309; }
+  .b-niv strong, .b-niv li::before { color: #be185d; }
+  .b-int strong, .b-int li::before { color: #0e7490; }
+  .b-tec strong, .b-tec li::before { color: #c2410c; }
+  .b-abr strong, .b-abr li::before { color: #9d174d; }
+  .b-gc strong, .b-gc li::before { color: #0f766e; }
+  .b-tap strong, .b-tap li::before { color: #6d28d9; }
+  .b-ato strong, .b-ato li::before { color: #047857; }
+
+  .hint { text-align: center; font-size: 1em; color: #64748b; margin-bottom: 30px; font-style: italic; font-weight: 600; }
+
+  /* ==================== DIAGRAMA DE BLOCOS ==================== */
+  .blocos-wrapper {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+  }
+
+  .blocos-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+  .bloco { border-radius: 16px; padding: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+  .bloco h2 {
+    font-size: 1.15em; font-weight: 800; text-transform: uppercase; text-align: center;
+    margin-bottom: 16px; letter-spacing: 0.4px; line-height: 1.3;
+  }
+  .bloco h2 small { display: block; font-size: 0.9em; font-weight: 500; text-transform: none; opacity: 0.8; margin-top: 6px; }
+
+  .bloco-dimensoes { background: linear-gradient(135deg, #fef3c7, #fde68a); border-top: 6px solid #f59e0b; }
+  .bloco-dimensoes h2 { color: #92400e; }
+  .bloco-tapscott { background: linear-gradient(135deg, #faf5ff, #f3e8ff); border-top: 6px solid #8b5cf6; }
+  .bloco-tapscott h2 { color: #6b21a8; }
+  .bloco-integradores { background: linear-gradient(135deg, #ecfeff, #cffafe); border-top: 6px solid #06b6d4; }
+  .bloco-integradores h2 { color: #155e75; }
+  .bloco-niveis { background: linear-gradient(135deg, #fdf2f8, #fce7f3); border-top: 6px solid #ec4899; }
+  .bloco-niveis h2 { color: #9d174d; }
+  .bloco-relacoes { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-top: 6px solid #3b82f6; }
+  .bloco-relacoes h2 { color: #1e40af; }
+  .bloco-tecnologias { background: linear-gradient(135deg, #fff7ed, #ffedd5); border-top: 6px solid #f97316; }
+  .bloco-tecnologias h2 { color: #9a3412; }
+  .bloco-atores { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-top: 6px solid #10b981; }
+  .bloco-atores h2 { color: #065f46; }
+
+  .dim-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .dim-item { text-align: center; padding: 16px 12px; background: rgba(255,255,255,0.8); border-radius: 12px; }
+  .dim-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5em; color: white; }
+  .dim-item.humana .dim-icon { background: #f59e0b; }
+  .dim-item.org .dim-icon { background: #10b981; }
+  .dim-item.tech .dim-icon { background: #3b82f6; }
+  .dim-item h4 { font-size: 1em; font-weight: 800; margin-bottom: 6px; }
+  .dim-item p { font-size: 0.9em; color: #475569; line-height: 1.4; }
+
+  .tap-table { width: 100%; border-collapse: collapse; font-size: 0.95em; background: white; border-radius: 12px; overflow: hidden; }
+  .tap-table th { background: #8b5cf6; color: white; padding: 12px 10px; text-align: left; font-weight: 700; }
+  .tap-table td { padding: 10px; border-bottom: 1px solid #f3e8ff; vertical-align: top; line-height: 1.4; }
+  .tap-table tr:last-child td { border-bottom: none; }
+  .tap-table tr:nth-child(even) { background: #faf5ff; }
+  .num-circle { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #8b5cf6; color: white; border-radius: 50%; font-weight: bold; font-size: 0.9em; margin-right: 6px; vertical-align: middle; }
+
+  .int-item { background: white; border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; border-left: 5px solid; }
+  .int-item:last-child { margin-bottom: 0; }
+  .int-item.erp { border-color: #3b82f6; } .int-item.crm { border-color: #10b981; }
+  .int-item.scm { border-color: #f59e0b; } .int-item.ecr { border-color: #ef4444; } .int-item.bi { border-color: #6366f1; }
+  .int-item h3 { font-size: 1em; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .int-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9em; flex-shrink: 0; }
+  .int-item.erp .int-icon { background: #3b82f6; } .int-item.crm .int-icon { background: #10b981; }
+  .int-item.scm .int-icon { background: #f59e0b; } .int-item.ecr .int-icon { background: #ef4444; } .int-item.bi .int-icon { background: #6366f1; }
+  .int-item ul { list-style: none; padding-left: 36px; font-size: 0.9em; color: #475569; }
+  .int-item li { padding: 3px 0; line-height: 1.4; }
+  .int-item li::before { content: '• '; color: #06b6d4; font-weight: bold; font-size: 1.2em; }
+
+  .nivel-block { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; border-left: 5px solid; }
+  .nivel-block:last-child { margin-bottom: 0; }
+  .nivel-block.op { border-color: #10b981; } .nivel-block.tac { border-color: #f59e0b; } .nivel-block.est { border-color: #8b5cf6; }
+  .nivel-titulo { font-size: 1em; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .nivel-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; color: white; font-size: 0.9em; font-weight: bold; flex-shrink: 0; }
+  .nivel-block.op .nivel-num { background: #10b981; } .nivel-block.tac .nivel-num { background: #f59e0b; } .nivel-block.est .nivel-num { background: #8b5cf6; }
+  .nivel-sub { font-size: 0.9em; font-weight: 700; color: #64748b; margin-bottom: 8px; padding-left: 36px; }
+  .nivel-block ul { list-style: none; font-size: 0.9em; color: #475569; padding-left: 36px; }
+  .nivel-block li { padding: 3px 0; line-height: 1.4; }
+  .nivel-block li strong { color: #1e293b; }
+
+  .fluxo-diagrama { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+  .fluxo-linha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .fluxo-box { padding: 12px 18px; border-radius: 10px; color: white; font-weight: 800; font-size: 0.9em; text-align: center; min-width: 100px; }
+  .fluxo-box small { display: block; font-weight: 500; font-size: 0.85em; opacity: 0.95; margin-top: 4px; }
+  .fluxo-box.sit { background: #10b981; } .fluxo-box.sig { background: #3b82f6; } .fluxo-box.eis { background: #8b5cf6; }
+  .fluxo-box.sae { background: #f59e0b; } .fluxo-box.sad { background: #ef4444; } .fluxo-box.se { background: #06b6d4; }
+  .fluxo-box.bi { background: #6366f1; } .fluxo-box.erp { background: #1e40af; } .fluxo-box.crm { background: #10b981; }
+  .fluxo-box.scm { background: #f59e0b; } .fluxo-box.ecr { background: #ec4899; }
+  .arrow { color: #3b82f6; font-weight: bold; font-size: 1.4em; }
+  .externo-box { background: #f1f5f9; border: 2px dashed #94a3b8; border-radius: 10px; padding: 10px 16px; font-size: 0.9em; color: #475569; text-align: center; width: 100%; font-weight: 600; }
+
+  .tec-fluxo { display: flex; flex-direction: column; gap: 8px; align-items: center; margin-bottom: 20px; }
+  .tec-item { display: flex; align-items: center; gap: 14px; background: white; padding: 12px 16px; border-radius: 10px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .tec-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2em; flex-shrink: 0; }
+  .tec-item.dados .tec-icon { background: #f97316; } .tec-item.info .tec-icon { background: #3b82f6; }
+  .tec-item.conh .tec-icon { background: #8b5cf6; } .tec-item.anal .tec-icon { background: #10b981; }
+  .tec-item.dec .tec-icon { background: #ef4444; } .tec-item.acao .tec-icon { background: #1e40af; }
+  .tec-text h4 { font-size: 1.05em; font-weight: 800; }
+  .tec-text p { font-size: 0.9em; color: #64748b; }
+  .tec-seta { color: #f97316; font-weight: bold; font-size: 1.3em; }
+  .tech-list { background: white; border-radius: 12px; padding: 16px; font-size: 0.9em; }
+  .tech-list h4 { font-size: 1.1em; color: #9a3412; margin-bottom: 12px; text-align: center; font-weight: 800; }
+  .tech-list ul { list-style: none; columns: 2; column-gap: 16px; }
+  .tech-list li { padding: 4px 0; padding-left: 18px; position: relative; break-inside: avoid; line-height: 1.5; }
+  .tech-list li::before { content: '✓'; position: absolute; left: 0; color: #10b981; font-weight: bold; font-size: 1.1em; }
+
+  .ator-block { background: white; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .ator-block:last-child { margin-bottom: 0; }
+  .ator-block h4 { font-size: 1em; font-weight: 800; color: #065f46; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .ator-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9em; }
+  .ator-block.internos .ator-icon { background: #3b82f6; } .ator-block.externos .ator-icon { background: #10b981; } .ator-block.apoio .ator-icon { background: #8b5cf6; }
+  .ator-block ul { list-style: none; font-size: 0.9em; color: #475569; padding-left: 36px; }
+  .ator-block li { padding: 3px 0; line-height: 1.4; }
+  .ator-block li::before { content: '• '; color: #10b981; font-weight: bold; font-size: 1.2em; }
+
+  /* ==================== INFOGRÁFICOS ==================== */
+  .infograficos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 30px; }
+
+  .info-card-block {
+    background: white; border-radius: 20px; padding: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-top: 6px solid;
+  }
+
+  .info-card-block h3 {
+    font-size: 1.2em; font-weight: 800; margin-bottom: 20px;
+    text-align: center; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  .piramide { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 0; }
+  .piramide-nivel {
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px 24px; color: white; font-weight: 800; font-size: 1.05em;
+    text-align: center; border-radius: 10px; transition: all 0.3s; cursor: pointer;
+  }
+  .piramide-nivel:hover { transform: scale(1.04); }
+  .piramide-nivel .pnum {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; background: rgba(255,255,255,0.25);
+    border-radius: 50%; margin-right: 10px; font-size: 1em;
+  }
+  .p-estrategico { background: linear-gradient(135deg, #7c3aed, #6d28d9); width: 50%; }
+  .p-tatico { background: linear-gradient(135deg, #f59e0b, #d97706); width: 70%; }
+  .p-operacional { background: linear-gradient(135deg, #10b981, #059669); width: 90%; }
+
+  .fluxo-horizontal { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 14px 0; }
+  .fluxo-etapa { flex: 1; min-width: 110px; text-align: center; padding: 16px 10px; border-radius: 12px; color: white; font-size: 0.9em; font-weight: 800; }
+  .fluxo-etapa strong { display: block; font-size: 1.2em; margin-bottom: 4px; }
+  .fluxo-etapa span { opacity: 0.9; font-size: 0.95em; font-weight: 500; }
+  .f-dados { background: #f97316; } .f-info { background: #10b981; } .f-conh { background: #3b82f6; }
+  .f-anal { background: #8b5cf6; } .f-dec { background: #ef4444; } .f-acao { background: #1e40af; }
+  .f-arrow { color: #94a3b8; font-weight: bold; font-size: 1.4em; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .stat-item { text-align: center; padding: 18px 14px; background: #f8fafc; border-radius: 12px; border: 2px solid #e2e8f0; }
+  .stat-num { font-size: 2.4em; font-weight: 800; color: #1e3a8a; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 0.9em; color: #64748b; font-weight: 700; }
+
+  .barras { display: flex; flex-direction: column; gap: 14px; padding: 10px 0; }
+  .barra-item { display: grid; grid-template-columns: 110px 1fr 60px; align-items: center; gap: 12px; font-size: 0.95em; }
+  .barra-label { font-weight: 800; color: #1e293b; }
+  .barra-track { background: #f1f5f9; height: 24px; border-radius: 12px; overflow: hidden; position: relative; }
+  .barra-fill {
+    height: 100%; border-radius: 12px; transition: width 1s ease;
+    display: flex; align-items: center; padding-left: 10px; color: white; font-size: 0.85em; font-weight: 700;
+  }
+  .barra-valor { font-weight: 800; color: #1e3a8a; font-size: 1em; text-align: right; }
+  .bar-total { background: linear-gradient(90deg, #10b981, #059669); }
+  .bar-direto { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+  .bar-indireto { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .bar-nulo { background: linear-gradient(90deg, #94a3b8, #64748b); }
+
+  .timeline { position: relative; padding: 14px 0 14px 45px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 16px; top: 20px; bottom: 20px;
+    width: 4px; background: linear-gradient(180deg, #8b5cf6, #ec4899); border-radius: 2px;
+  }
+  .timeline-item { position: relative; padding: 10px 0 16px 0; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -36px; top: 14px; width: 18px; height: 18px;
+    border-radius: 50%; background: #8b5cf6; border: 4px solid white; box-shadow: 0 0 0 3px #8b5cf6;
+  }
+  .timeline-item h4 { font-size: 1.05em; font-weight: 800; color: #4c1d95; margin-bottom: 6px; }
+  .timeline-item p { font-size: 0.95em; color: #475569; line-height: 1.5; }
+
+  .atores-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .ator-card { text-align: center; padding: 18px 12px; background: #f8fafc; border-radius: 12px; border: 2px solid #e2e8f0; }
+  .ator-card .icon-big { font-size: 2.2em; margin-bottom: 8px; }
+  .ator-card h5 { font-size: 1em; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+  .ator-card p { font-size: 0.9em; color: #64748b; line-height: 1.4; }
+
+  .if-blue { border-color: #3b82f6; } .if-blue h3 { color: #1e40af; }
+  .if-purple { border-color: #8b5cf6; } .if-purple h3 { color: #6d28d9; }
+  .if-orange { border-color: #f97316; } .if-orange h3 { color: #c2410c; }
+  .if-green { border-color: #10b981; } .if-green h3 { color: #065f46; }
+  .if-pink { border-color: #ec4899; } .if-pink h3 { color: #9d174d; }
+  .if-cyan { border-color: #06b6d4; } .if-cyan h3 { color: #155e75; }
+
+  /* ==================== REFERÊNCIAS (DESTAQUE) ==================== */
+  .referencias-section {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 20px;
+    padding: 40px 50px;
+    margin: 30px 0;
+    color: #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .referencias-section h2 {
+    color: #fbbf24;
+    font-size: 1.6em;
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .referencias-section ul { list-style: none; padding: 0; }
+  .referencias-section li {
+    padding: 18px 22px;
+    border-left: 5px solid #fbbf24;
+    margin-bottom: 16px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    font-size: 1.1em; /* AUMENTADO */
+    line-height: 1.7;
+    transition: background 0.2s;
+  }
+  .referencias-section li:hover { background: rgba(255,255,255,0.1); }
+  .referencias-section li strong { color: #fbbf24; }
+
+  /* ==================== FOOTER ==================== */
+  .footer { text-align: center; padding: 30px; color: #475569; font-size: 1em; margin-top: 20px; }
+  .footer p { margin: 6px 0; }
+
+  @media (max-width: 1024px) {
+    .blocos-grid { grid-template-columns: 1fr 1fr; }
+    .infograficos-grid { grid-template-columns: 1fr; }
+    .header-right { grid-template-columns: 1fr; min-width: 0; width: 100%; }
+    .atores-cards { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    body { padding-top: 80px; font-size: 16px; }
+    .blocos-grid { grid-template-columns: 1fr; }
+    .indice { left: 20px; right: 20px; transform: none; max-width: none; padding: 10px 16px; }
+    .indice-logo span { display: none; }
+    .indice-link { padding: 8px 12px; font-size: 0.85em; }
+    .mm-viewport { height: 600px; }
+    .fluxo-horizontal { flex-direction: column; }
+    .f-arrow { transform: rotate(90deg); }
+    .stats-grid { grid-template-columns: 1fr; }
+    .dim-row { grid-template-columns: 1fr; }
+    .atores-cards { grid-template-columns: 1fr; }
+    .header { flex-direction: column; text-align: center; }
+    .barra-item { grid-template-columns: 90px 1fr 50px; font-size: 0.85em; }
+  }
+
+  @media print {
+    .indice, .btn-topo, .controls, .hint, .progress { display: none !important; }
+    body { padding-top: 20px; background: white !important; color: black !important; font-size: 14px; }
+    .mm-viewport { height: auto !important; overflow: visible !important; border: 1px solid #ccc; }
+    .header, .section-title, .bloco, .info-card-block, .referencias-section, .footer {
+      break-inside: avoid !important; page-break-inside: avoid !important;
+      box-shadow: none !important; border: 1px solid #e2e8f0 !important;
+    }
+    .referencias-section { background: #f8fafc !important; color: #1e293b !important; }
+    .referencias-section h2, .referencias-section li strong { color: #1e3a8a !important; }
+    .referencias-section li { border-left-color: #1e3a8a !important; background: white !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav class="indice">
+  <div class="indice-logo">
+    <div class="logo-icon">🎓</div>
+    <span>UFBA · SI</span>
+  </div>
+  <div class="indice-links">
+    <a href="#sec-mapa" class="indice-link active" data-section="sec-mapa">🧠 Mapa Mental</a>
+    <a href="#sec-diagrama" class="indice-link" data-section="sec-diagrama">📊 Diagrama</a>
+    <a href="#sec-infograficos" class="indice-link" data-section="sec-infograficos">📈 Infográficos</a>
+    <a href="#sec-referencias" class="indice-link" data-section="sec-referencias">📚 Referências</a>
+  </div>
+</nav>
+
+<button class="btn-topo" id="btnTopo" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Voltar ao topo"></button>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <h1>🎓 UNIVERSIDADE FEDERAL DA BAHIA</h1>
+      <h2>Escola de Administração · Bacharelado em Administração</h2>
+    </div>
+    <div class="header-right">
+      <div class="info-card"><h4>👨‍🎓 Discente</h4><p>Carlos de Souza de Jesus</p></div>
+      <div class="info-card"><h4>👨‍🏫 Docente</h4><p>Prof. Dr. Jair Sampaio Soares Júnior</p></div>
+      <div class="info-card"><h4>📚 Disciplina</h4><p>ADMF01 – Sistemas de Apoio à Decisão</p></div>
+      <div class="info-card"><h4>📅 Período</h4><p>2026.2 · Salvador-BA</p></div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 1: MAPA MENTAL -->
+  <div class="section-title" id="sec-mapa">
+    <div class="num">1</div>
+    <div>
+      <h2>Mapa Mental: Sistemas de Informação e suas Relações</h2>
+      <p>Ramos orgânicos partindo do núcleo central, com as 8 grandes áreas temáticas</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="mmZoomOut()" aria-label="Diminuir zoom">− Diminuir</button>
+    <span class="zoom-level" id="mmZoomLevel">55%</span>
+    <button onclick="mmZoomIn()" aria-label="Aumentar zoom">+ Aumentar</button>
+    <button onclick="mmReset()" aria-label="Resetar visualização">⟲ Resetar</button>
+    <button onclick="mmFit()" aria-label="Ajustar à tela">⛶ Ajustar</button>
+  </div>
+
+  <div class="mm-viewport" id="mmViewport" role="application" aria-label="Mapa Mental Interativo">
+    <div class="mm-canvas" id="mmCanvas">
+      <svg width="3200" height="2200" style="position:absolute;top:0;left:0;pointer-events:none;">
+        <path d="M 1600 1100 Q 1300 850 900 550 Q 700 400 550 300" stroke="#f59e0b" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1300 850 900 550 Q 700 400 550 300" stroke="#f59e0b" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1250 1100 900 1100 Q 600 1100 350 1100" stroke="#ec4899" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1250 1100 900 1100 Q 600 1100 350 1100" stroke="#ec4899" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1900 850 2300 550 Q 2500 400 2650 300" stroke="#06b6d4" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1900 850 2300 550 Q 2500 400 2650 300" stroke="#06b6d4" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1950 1100 2300 1100 Q 2600 1100 2850 1100" stroke="#f97316" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1950 1100 2300 1100 Q 2600 1100 2850 1100" stroke="#f97316" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1900 1350 2300 1650 Q 2500 1800 2650 1900" stroke="#db2777" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1900 1350 2300 1650 Q 2500 1800 2650 1900" stroke="#db2777" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1300 1350 900 1650 Q 700 1800 550 1900" stroke="#14b8a6" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1300 1350 900 1650 Q 700 1800 550 1900" stroke="#14b8a6" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1600 800 1600 550 Q 1600 350 1600 200" stroke="#8b5cf6" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1600 800 1600 550 Q 1600 350 1600 200" stroke="#8b5cf6" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 1600 1100 Q 1600 1400 1600 1650 Q 1600 1850 1600 2000" stroke="#10b981" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <path d="M 1600 1100 Q 1600 1400 1600 1650 Q 1600 1850 1600 2000" stroke="#10b981" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.45"/>
+        <path d="M 750 420 Q 650 380 500 320" stroke="#f59e0b" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 750 420 Q 650 460 500 500" stroke="#f59e0b" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 750 420 Q 700 550 700 680" stroke="#f59e0b" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 600 1100 Q 500 950 400 800" stroke="#ec4899" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 600 1100 Q 500 1250 400 1400" stroke="#ec4899" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 420 Q 2500 350 2700 250" stroke="#06b6d4" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 420 Q 2550 450 2750 450" stroke="#06b6d4" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 420 Q 2550 550 2700 650" stroke="#06b6d4" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 420 Q 2400 300 2300 220" stroke="#06b6d4" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2650 1100 Q 2750 950 2900 800" stroke="#f97316" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2650 1100 Q 2750 1100 2900 1100" stroke="#f97316" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2650 1100 Q 2750 1250 2900 1400" stroke="#f97316" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 1800 Q 2550 1850 2700 1950" stroke="#db2777" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 1800 Q 2600 1750 2750 1650" stroke="#db2777" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 2450 1800 Q 2500 1900 2500 2050" stroke="#db2777" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 750 1800 Q 650 1850 500 1950" stroke="#14b8a6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 750 1800 Q 600 1750 450 1650" stroke="#14b8a6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 750 1800 Q 700 1900 700 2050" stroke="#14b8a6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 350 Q 1500 300 1350 250" stroke="#8b5cf6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 350 Q 1700 300 1850 250" stroke="#8b5cf6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 350 Q 1450 400 1250 400" stroke="#8b5cf6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 350 Q 1750 400 1950 400" stroke="#8b5cf6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 350 Q 1600 200 1600 80" stroke="#8b5cf6" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 1850 Q 1450 1950 1300 2000" stroke="#10b981" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 1850 Q 1750 1950 1900 2000" stroke="#10b981" stroke-width="4" fill="none" opacity="0.5"/>
+        <path d="M 1600 1850 Q 1600 2050 1600 2150" stroke="#10b981" stroke-width="4" fill="none" opacity="0.5"/>
+        <circle cx="1420" cy="1010" r="8" fill="#f59e0b" opacity="0.9"/>
+        <circle cx="1420" cy="1100" r="8" fill="#ec4899" opacity="0.9"/>
+        <circle cx="1780" cy="1010" r="8" fill="#06b6d4" opacity="0.9"/>
+        <circle cx="1780" cy="1100" r="8" fill="#f97316" opacity="0.9"/>
+        <circle cx="1780" cy="1190" r="8" fill="#db2777" opacity="0.9"/>
+        <circle cx="1420" cy="1190" r="8" fill="#14b8a6" opacity="0.9"/>
+        <circle cx="1600" cy="970" r="8" fill="#8b5cf6" opacity="0.9"/>
+        <circle cx="1600" cy="1230" r="8" fill="#10b981" opacity="0.9"/>
+      </svg>
+
+      <div class="mm-center" tabindex="0" role="group" aria-label="Núcleo Central">
+        <div class="icon">🗄️</div>
+        <h2>SISTEMAS DE<br/>INFORMAÇÃO</h2>
+        <p>coletar · guardar · distribuir<br/>informações para decisões</p>
+        <div class="fonte">Freitas et al. (1997), apud Perottoni et al. (2001)</div>
+      </div>
+
+      <div class="branch-pill c-dim" style="top:280px; left:550px;" tabindex="0" role="group">📐 Dimensões</div>
+      <div class="sub-node b-dim" style="top:280px; left:180px;" tabindex="0"><strong>👤 Humana</strong><span class="desc">Pessoas que alimentam e utilizam</span></div>
+      <div class="sub-node b-dim" style="top:500px; left:180px;" tabindex="0"><strong>🏢 Organizacional</strong><span class="desc">Cultura e ambiente da empresa</span></div>
+      <div class="sub-node b-dim" style="top:700px; left:400px;" tabindex="0"><strong>⚙️ Tecnológica</strong><span class="desc">Entrada, processamento, armazenamento</span></div>
+
+      <div class="branch-pill c-niv" style="top:1100px; left:350px;" tabindex="0" role="group">🏛️ Níveis Hierárquicos</div>
+      <div class="sub-node b-niv" style="top:800px; left:180px;" tabindex="0"><strong>🔵 Operacional</strong><ul><li><b>SIT / SPT</b> — supervisores, operadores</li><li><b>SAE</b> — executivos, administrativos</li></ul></div>
+      <div class="sub-node b-niv" style="top:1100px; left:120px;" tabindex="0"><strong>🟢 Tático</strong><ul><li><b>SIG</b> — gerentes médios</li><li><b>SAD</b> — decisores, gestores</li><li><b>SADG</b> — grupos</li></ul></div>
+      <div class="sub-node b-niv" style="top:1400px; left:180px;" tabindex="0"><strong>🟣 Estratégico</strong><ul><li><b>SIE / EIS</b> — alta gestão</li><li><b>SE</b> — especialistas</li></ul></div>
+
+      <div class="branch-pill c-int" style="top:280px; left:2650px;" tabindex="0" role="group">🔗 Integradores</div>
+      <div class="sub-node b-int" style="top:150px; left:2350px;" tabindex="0"><strong>🏭 ERP</strong><span class="desc">Integração total; base única centralizada</span></div>
+      <div class="sub-node b-int" style="top:280px; left:2820px;" tabindex="0"><strong>🤝 CRM</strong><span class="desc">Visão 360° do cliente; multicanal</span></div>
+      <div class="sub-node b-int" style="top:470px; left:2820px;" tabindex="0"><strong>🚚 SCM</strong><span class="desc">Cadeia de suprimentos ponta a ponta</span></div>
+      <div class="sub-node b-int" style="top:650px; left:2650px;" tabindex="0"><strong>🛒 ECR</strong><span class="desc">Cooperação varejo/fornecedores</span></div>
+      <div class="sub-node b-int" style="top:800px; left:2450px;" tabindex="0"><strong>📉 BI</strong><span class="desc">Análise e visualização de dados históricos</span></div>
+
+      <div class="branch-pill c-tec" style="top:1100px; left:2850px;" tabindex="0" role="group">💾 Tecnologias de Dados</div>
+      <div class="sub-node b-tec" style="top:800px; left:3020px;" tabindex="0"><strong>🗄️ DW</strong><span class="desc">Data Warehouse — histórico consolidado</span></div>
+      <div class="sub-node b-tec" style="top:1100px; left:3060px;" tabindex="0"><strong>⛏️ DM</strong><span class="desc">Data Mining — padrões e regras</span></div>
+      <div class="sub-node b-tec" style="top:1400px; left:3020px;" tabindex="0"><strong>🔬 KDD</strong><span class="desc">Seleção → Pré-proc. → Transf. → Mineração → Avaliação</span></div>
+
+      <div class="branch-pill c-abr" style="top:1900px; left:2650px;" tabindex="0" role="group">🌐 Abrangência Externa</div>
+      <div class="sub-node b-abr" style="top:1700px; left:2850px;" tabindex="0"><strong>🛒 e-Commerce</strong><span class="desc">Compra e venda digital (consumidores)</span></div>
+      <div class="sub-node b-abr" style="top:1900px; left:3020px;" tabindex="0"><strong>💼 e-Business</strong><span class="desc">Operação digital da cadeia de valor</span></div>
+      <div class="sub-node b-abr" style="top:2100px; left:2850px;" tabindex="0"><strong>🏛️ e-Government</strong><span class="desc">Serviços públicos digitais</span></div>
+      <div class="sub-node b-abr" style="top:2200px; left:2450px;" tabindex="0"><strong>📑 SPED</strong><span class="desc">Escrituração fiscal (NF-e, EFD, ECD)</span></div>
+
+      <div class="branch-pill c-gc" style="top:1900px; left:550px;" tabindex="0" role="group">🧠 Gestão do Conhecimento</div>
+      <div class="sub-node b-gc" style="top:1700px; left:350px;" tabindex="0"><strong>📚 GC</strong><span class="desc">Capturar, compartilhar e aplicar conhecimento</span></div>
+      <div class="sub-node b-gc" style="top:1900px; left:180px;" tabindex="0"><strong>🔍 IC</strong><span class="desc">Inteligência Competitiva — mercado</span></div>
+      <div class="sub-node b-gc" style="top:2100px; left:350px;" tabindex="0"><strong>🗺️ GIS</strong><span class="desc">Análise espacial e georreferenciamento</span></div>
+
+      <div class="branch-pill c-tap" style="top:200px; left:1600px;" tabindex="0" role="group">📈 Evolução Tapscott (1997)</div>
+      <div class="sub-node b-tap" style="top:100px; left:1150px;" tabindex="0"><strong>1️⃣ Indivíduo Eficiente</strong><span class="desc">Multimídia pessoal · SIT, SAE</span></div>
+      <div class="sub-node b-tap" style="top:100px; left:1450px;" tabindex="0"><strong>2️⃣ Equipe de Alto Desempenho</strong><span class="desc">Grupos · SIG, SAD, SADG</span></div>
+      <div class="sub-node b-tap" style="top:100px; left:1750px;" tabindex="0"><strong>3️⃣ Organização Integrada</strong><span class="desc">Infoestrutura · ERP, BI, DW</span></div>
+      <div class="sub-node b-tap" style="top:100px; left:2050px;" tabindex="0"><strong>4️⃣ Empresa Ampliada</strong><span class="desc">Parceiros · SCM, CRM, ECR</span></div>
+      <div class="sub-node b-tap" style="top:400px; left:1600px;" tabindex="0"><strong>5️⃣ Empresa Interligada em Rede</strong><span class="desc">A Net · e-Commerce, e-Gov, KDD, GC, IC</span></div>
+
+      <div class="branch-pill c-ato" style="top:2000px; left:1600px;" tabindex="0" role="group">👥 Atores Envolvidos</div>
+      <div class="sub-node b-ato" style="top:2000px; left:1150px;" tabindex="0"><strong>👤 Internos</strong><ul><li>Operador (SIT)</li><li>Gerente (SIG)</li><li>Decisor (SAD)</li><li>Executivo (EIS/SIE)</li></ul></div>
+      <div class="sub-node b-ato" style="top:2000px; left:1600px;" tabindex="0"><strong>🌐 Externos</strong><ul><li>Clientes (CRM)</li><li>Fornecedores (SCM)</li><li>Cidadão (e-Gov)</li><li>Governo (SPED)</li></ul></div>
+      <div class="sub-node b-ato" style="top:2000px; left:2050px;" tabindex="0"><strong>🛠️ Apoio</strong><ul><li>TI / Infraestrutura</li><li>Analistas de dados</li><li>Comitês de decisão</li></ul></div>
+    </div>
+  </div>
+  <p class="hint">💡 Scroll para zoom · arraste para mover · hover nos nós para destaque</p>
+
+  <!-- SEÇÃO 2: DIAGRAMA DE BLOCOS -->
+  <div class="section-title" id="sec-diagrama">
+    <div class="num">2</div>
+    <div>
+      <h2>Diagrama de Blocos: Sistemas de Informação e suas Relações</h2>
+      <p>Cards temáticos, fluxos de dados e atores envolvidos</p>
+    </div>
+  </div>
+
+  <div class="blocos-wrapper">
+    <div class="blocos-grid">
+      <div class="bloco bloco-dimensoes">
+        <h2>📐 Dimensões dos SI<small>(Perottoni et al., 2001)</small></h2>
+        <div class="dim-row">
+          <div class="dim-item humana"><div class="dim-icon">👤</div><h4>Humana</h4><p>Pessoas que alimentam e utilizam</p></div>
+          <div class="dim-item org"><div class="dim-icon">🏢</div><h4>Organizacional</h4><p>Cultura e ambiente</p></div>
+          <div class="dim-item tech"><div class="dim-icon">⚙️</div><h4>Tecnológica</h4><p>Entrada, processamento, saída</p></div>
+        </div>
+      </div>
+
+      <div class="bloco bloco-tapscott">
+        <h2>📈 Evolução de Tapscott (1997)<small>Da eficiência individual à rede global</small></h2>
+        <table class="tap-table">
+          <thead><tr><th style="width:38%;">Nível</th><th>Caracterização</th><th style="width:26%;">Sistemas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="num-circle">1</span><b>Indivíduo eficiente</b></td><td>Multimídia pessoal, tarefas e eficiência</td><td>SIT, SAE</td></tr>
+            <tr><td><span class="num-circle">2</span><b>Equipe de alto desempenho</b></td><td>Trabalho em grupo e reformulação de processos</td><td>SIG, SAD, SADG</td></tr>
+            <tr><td><span class="num-circle">3</span><b>Organização integrada</b></td><td>Infoestrutura e integração organizacional</td><td>ERP, BI, DW</td></tr>
+            <tr><td><span class="num-circle">4</span><b>Empresa ampliada</b></td><td>Integração com parceiros externos</td><td>SCM, CRM, ECR</td></tr>
+            <tr><td><span class="num-circle">5</span><b>Empresa em rede</b></td><td>A Net, criação de riqueza e desenvolvimento social</td><td>e-Commerce, e-Gov, KDD, GC, IC</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bloco bloco-integradores">
+        <h2>🔗 Sistemas Integradores<small>e de Abrangência Organizacional</small></h2>
+        <div class="int-item erp"><h3><span class="int-icon">⚙️</span> ERP</h3><ul><li>Integração total dos processos</li><li>Base de dados única e centralizada</li><li>SAP, Oracle, TOTVS</li></ul></div>
+        <div class="int-item crm"><h3><span class="int-icon">🤝</span> CRM</h3><ul><li>Relacionamento com clientes</li><li>Visão 360° · multicanal</li><li>Salesforce, HubSpot</li></ul></div>
+        <div class="int-item scm"><h3><span class="int-icon">🚚</span> SCM</h3><ul><li>Cadeia de suprimentos ponta a ponta</li><li>SAP SCM, Oracle SCM</li></ul></div>
+        <div class="int-item ecr"><h3><span class="int-icon">🛒</span> ECR</h3><ul><li>Cooperação varejo/fornecedores</li><li>GS1, VMI</li></ul></div>
+        <div class="int-item bi"><h3><span class="int-icon">📉</span> BI</h3><ul><li>Análise e visualização</li><li>Power BI, Tableau</li></ul></div>
+      </div>
+
+      <div class="bloco bloco-niveis">
+        <h2>🏛️ Níveis Hierárquicos<small>e Principais Sistemas</small></h2>
+        <div class="nivel-block op">
+          <div class="nivel-titulo"><span class="nivel-num">1</span> OPERACIONAL</div>
+          <div class="nivel-sub">SIT / SPT e SAE</div>
+          <ul><li><strong>Usuários:</strong> supervisores, operadores, chão de fábrica</li><li><strong>Foco:</strong> transações diárias</li><li><strong>Suporte:</strong> nulo (SIT) / indireto (SAE)</li></ul>
+        </div>
+        <div class="nivel-block tac">
+          <div class="nivel-titulo"><span class="nivel-num">2</span> TÁTICO</div>
+          <div class="nivel-sub">SIG, SAD e SADG</div>
+          <ul><li><strong>Usuários:</strong> gerentes médios / decisores</li><li><strong>Foco:</strong> relatórios e simulações</li><li><strong>Suporte:</strong> indireto (SIG) / direto (SAD)</li></ul>
+        </div>
+        <div class="nivel-block est">
+          <div class="nivel-titulo"><span class="nivel-num">3</span> ESTRATÉGICO</div>
+          <div class="nivel-sub">SIE / EIS e SE</div>
+          <ul><li><strong>Usuários:</strong> alta gestão, especialistas</li><li><strong>Foco:</strong> KPIs, raciocínio especialista</li><li><strong>Suporte:</strong> indireto (EIS) / direto (SE)</li></ul>
+        </div>
+      </div>
+
+      <div class="bloco bloco-relacoes">
+        <h2>🔀 Relações entre Sistemas</h2>
+        <div class="fluxo-diagrama">
+          <div class="fluxo-linha">
+            <div class="fluxo-box sit">SIT<small>Transações</small></div>
+            <span class="arrow">→</span>
+            <div class="fluxo-box sig">SIG<small>Relatórios</small></div>
+            <span class="arrow">→</span>
+            <div class="fluxo-box eis">EIS<small>Dashboards</small></div>
+          </div>
+          <div class="fluxo-linha">
+            <div class="fluxo-box sae">SAE<small>Rotinas</small></div>
+            <span class="arrow">↓</span>
+            <div class="fluxo-box sad">SAD<small>Simulações</small></div>
+            <span class="arrow">⇢</span>
+            <div class="fluxo-box se">SE<small>Raciocínio IA</small></div>
+          </div>
+          <div class="fluxo-linha"><div class="fluxo-box bi" style="min-width:260px;">BI / DW / DM / KDD<small>Análise e conhecimento</small></div></div>
+          <div class="fluxo-linha"><div class="fluxo-box erp" style="min-width:280px;">ERP<small>Integração de processos e dados</small></div></div>
+          <div class="fluxo-linha">
+            <div class="fluxo-box crm">CRM</div>
+            <div class="fluxo-box scm">SCM</div>
+            <div class="fluxo-box ecr">ECR</div>
+          </div>
+          <div class="externo-box">🌐 Fontes externas (mercado, governo, internet)</div>
+        </div>
+      </div>
+
+      <div class="bloco bloco-tecnologias">
+        <h2>💾 Fluxo de Dados e Tecnologias</h2>
+        <div class="tec-fluxo">
+          <div class="tec-item dados"><div class="tec-icon">📊</div><div class="tec-text"><h4>Dados</h4><p>SIT / SAE</p></div></div>
+          <span class="tec-seta">↓</span>
+          <div class="tec-item info"><div class="tec-icon">ℹ️</div><div class="tec-text"><h4>Informação</h4><p>SIG / BI</p></div></div>
+          <span class="tec-seta">↓</span>
+          <div class="tec-item conh"><div class="tec-icon">🧠</div><div class="tec-text"><h4>Conhecimento</h4><p>DW / DM / KDD</p></div></div>
+          <span class="tec-seta">↓</span>
+          <div class="tec-item anal"><div class="tec-icon">📈</div><div class="tec-text"><h4>Análise</h4><p>SAD / SADG</p></div></div>
+          <span class="tec-seta">↓</span>
+          <div class="tec-item dec"><div class="tec-icon">🎯</div><div class="tec-text"><h4>Decisão</h4><p>EIS / SIE</p></div></div>
+          <span class="tec-seta">↓</span>
+          <div class="tec-item acao"><div class="tec-icon">🚀</div><div class="tec-text"><h4>Ação</h4><p>Gestores / Executivos</p></div></div>
+        </div>
+        <div class="tech-list">
+          <h4>🔧 Principais tecnologias</h4>
+          <ul>
+            <li>Banco de dados</li><li>Data Warehouse</li><li>Data Mining</li><li>Inteligência Artificial</li>
+            <li>Business Intelligence</li><li>Big Data</li><li>Cloud Computing</li><li>Segurança da Informação</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bloco bloco-atores">
+        <h2>👥 Atores Envolvidos</h2>
+        <div class="ator-block internos">
+          <h4><span class="ator-icon">👤</span> Usuários internos</h4>
+          <ul><li>Operacional (SIT)</li><li>Gerente (SIG)</li><li>Decisor (SAD)</li><li>Executivo (EIS/SIE)</li><li>Especialista (SE)</li></ul>
+        </div>
+        <div class="ator-block externos">
+          <h4><span class="ator-icon">🌐</span> Atores externos</h4>
+          <ul><li>Clientes (CRM)</li><li>Fornecedores (SCM)</li><li>Cidadão (e-Government)</li><li>Governo (SPED)</li></ul>
+        </div>
+        <div class="ator-block apoio">
+          <h4><span class="ator-icon">🛠️</span> Papéis de apoio</h4>
+          <ul><li>TI / Infraestrutura</li><li>Analistas de dados</li><li>Comitês de decisão</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 3: INFOGRÁFICOS -->
+  <div class="section-title" id="sec-infograficos">
+    <div class="num">3</div>
+    <div>
+      <h2>Infográficos: Síntese Visual dos Sistemas de Informação</h2>
+      <p>Visualizações comparativas, fluxos e distribuição de categorias</p>
+    </div>
+  </div>
+
+  <div class="infograficos-grid">
+    <div class="info-card-block if-purple">
+      <h3>🏛️ Pirâmide dos Níveis Hierárquicos</h3>
+      <div class="piramide">
+        <div class="piramide-nivel p-estrategico"><span class="pnum">3</span> Estratégico · SIE, SE</div>
+        <div class="piramide-nivel p-tatico"><span class="pnum">2</span> Tático · SIG, SAD, SADG</div>
+        <div class="piramide-nivel p-operacional"><span class="pnum">1</span> Operacional · SIT, SAE</div>
+      </div>
+    </div>
+
+    <div class="info-card-block if-blue">
+      <h3>📊 Do Dado à Decisão</h3>
+      <div class="fluxo-horizontal">
+        <div class="fluxo-etapa f-dados"><strong>Dados</strong><span>SIT / SAE</span></div>
+        <span class="f-arrow">→</span>
+        <div class="fluxo-etapa f-info"><strong>Info</strong><span>SIG / BI</span></div>
+        <span class="f-arrow">→</span>
+        <div class="fluxo-etapa f-conh"><strong>Conhec.</strong><span>DW / DM / KDD</span></div>
+        <span class="f-arrow">→</span>
+        <div class="fluxo-etapa f-anal"><strong>Análise</strong><span>SAD / SADG</span></div>
+        <span class="f-arrow">→</span>
+        <div class="fluxo-etapa f-dec"><strong>Decisão</strong><span>EIS / SIE</span></div>
+        <span class="f-arrow">→</span>
+        <div class="fluxo-etapa f-acao"><strong>Ação</strong><span>Organização</span></div>
+      </div>
+    </div>
+
+    <div class="info-card-block if-cyan">
+      <h3>📈 Panorama por Categoria</h3>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Níveis Hierárquicos</div></div>
+        <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Sistemas de Nível</div></div>
+        <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Sistemas Integradores</div></div>
+        <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Tecnologias de Dados</div></div>
+        <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Abrangência Externa</div></div>
+        <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Grandes Áreas</div></div>
+      </div>
+    </div>
+
+    <div class="info-card-block if-green">
+      <h3>🎯 Suporte à Decisão por Sistema</h3>
+      <div class="barras">
+        <div class="barra-item"><span class="barra-label">SIT / SPT</span><div class="barra-track"><div class="barra-fill bar-nulo" style="width:10%;">Nulo</div></div><span class="barra-valor">0%</span></div>
+        <div class="barra-item"><span class="barra-label">SAE</span><div class="barra-track"><div class="barra-fill bar-indireto" style="width:35%;">Indireto</div></div><span class="barra-valor">30%</span></div>
+        <div class="barra-item"><span class="barra-label">SIG</span><div class="barra-track"><div class="barra-fill bar-indireto" style="width:55%;">Indireto</div></div><span class="barra-valor">50%</span></div>
+        <div class="barra-item"><span class="barra-label">SAD</span><div class="barra-track"><div class="barra-fill bar-direto" style="width:85%;">Direto</div></div><span class="barra-valor">85%</span></div>
+        <div class="barra-item"><span class="barra-label">EIS / SIE</span><div class="barra-track"><div class="barra-fill bar-indireto" style="width:65%;">Indireto</div></div><span class="barra-valor">60%</span></div>
+        <div class="barra-item"><span class="barra-label">SE</span><div class="barra-track"><div class="barra-fill bar-direto" style="width:90%;">Direto</div></div><span class="barra-valor">90%</span></div>
+      </div>
+    </div>
+
+    <div class="info-card-block if-pink">
+      <h3>📈 Trajetória de Maturidade Digital (Tapscott)</h3>
+      <div class="timeline">
+        <div class="timeline-item"><h4>1. Indivíduo Eficiente</h4><p>Multimídia pessoal · tarefas e eficiência no aprendizado · SIT, SAE</p></div>
+        <div class="timeline-item"><h4>2. Equipe de Alto Desempenho</h4><p>Computação em grupo · reformulação de cargos e processos · SIG, SAD, SADG</p></div>
+        <div class="timeline-item"><h4>3. Organização Integrada</h4><p>Infoestrutura da empresa · transformação organizacional · ERP, BI, DW</p></div>
+        <div class="timeline-item"><h4>4. Empresa Ampliada</h4><p>Computação interempresa · remodelação dos relacionamentos externos · SCM, CRM, ECR</p></div>
+        <div class="timeline-item"><h4>5. Empresa Interligada em Rede</h4><p>A Net · criação de riqueza e desenvolvimento social · e-Commerce, e-Gov, KDD, GC, IC</p></div>
+      </div>
+    </div>
+
+    <div class="info-card-block if-orange">
+      <h3>👥 Mapa de Atores Envolvidos</h3>
+      <div class="atores-cards">
+        <div class="ator-card"><div class="icon-big">👤</div><h5>Internos</h5><p>Operadores · gerentes · decisores · executivos · especialistas</p></div>
+        <div class="ator-card"><div class="icon-big">🌐</div><h5>Externos</h5><p>Clientes · fornecedores · cidadãos · governo · parceiros</p></div>
+        <div class="ator-card"><div class="icon-big">🛠️</div><h5>Apoio</h5><p>TI · analistas de dados · consultores · comitês</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 4: REFERÊNCIAS BIBLIOGRÁFICAS (COMPLETA E DESTACADA) -->
+  <div class="section-title" id="sec-referencias">
+    <div class="num">4</div>
+    <div>
+      <h2>Referências Bibliográficas</h2>
+      <p>Fontes utilizadas na elaboração do mapa mental, diagramas e infográficos</p>
+    </div>
+  </div>
+
+  <div class="referencias-section">
+    <h2>📚 Referências Utilizadas</h2>
+    <ul>
+      <li><strong>PEROTTONI, R. et al.</strong> Sistemas de informações: um estudo comparativo das características tradicionais às atuais. <em>ReAd</em>, v. 7, n. 3, 2001.</li>
+      <li><strong>TAPSCOTT, D.</strong> A empresa em rede. In: <em>Economia Digital</em>. São Paulo: Makron Books, 1997.</li>
+      <li><strong>LAUDON, K. C.; LAUDON, J. P.</strong> Sistemas de informação gerenciais. 9. ed. São Paulo: Pearson, 2010.</li>
+      <li><strong>TURBAN, E.; SHARDA, R.; DELEN, D.</strong> Decision support and business intelligence systems. 9. ed. Pearson, 2011.</li>
+      <li><strong>SPRAGUE, R. H.; WATSON, H. J.</strong> Sistemas de apoio à decisão. Rio de Janeiro: Campus, 1991.</li>
+      <li><strong>FREITAS, H. et al.</strong> Informação e decisão: sistemas de apoio e seu impacto. Porto Alegre: Ortiz, 1997.</li>
+      <li><strong>Materiais do Classroom</strong> (Aulas 1 a 9, resenhas, sínteses e artigos complementares).</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <p><strong>Universidade Federal da Bahia — Escola de Administração</strong></p>
+    <p>Bacharelado em Administração · ADMF01 – Sistemas de Apoio à Decisão · 2026.2</p>
+    <p style="margin-top:8px;">Discente: Carlos de Souza de Jesus · Docente: Prof. Dr. Jair Sampaio Soares Júnior</p>
+  </div>
+
+</div>
+
+<script>
+  let mmScale = 0.55, mmTx = 0, mmTy = 0;
+  let mmDragging = false, mmSx = 0, mmSy = 0;
+  const mmViewport = document.getElementById('mmViewport');
+  const mmCanvas = document.getElementById('mmCanvas');
+  const mmZoomLevel = document.getElementById('mmZoomLevel');
+
+  function mmApply() {
+    mmCanvas.style.transform = `translate(${mmTx}px, ${mmTy}px) scale(${mmScale})`;
+    mmZoomLevel.textContent = Math.round(mmScale * 100) + '%';
+  }
+
+  function mmZoomIn() { mmScale = Math.min(mmScale + 0.1, 2.5); mmApply(); }
+  function mmZoomOut() { mmScale = Math.max(mmScale - 0.1, 0.25); mmApply(); }
+  function mmReset() { mmScale = 0.55; mmTx = 0; mmTy = 0; mmApply(); }
+
+  function mmFit() {
+    const vp = mmViewport.getBoundingClientRect();
+    const sX = vp.width / 3200;
+    const sY = vp.height / 2200;
+    mmScale = Math.min(sX, sY) * 0.98;
+    mmTx = (vp.width - 3200 * mmScale) / 2;
+    mmTy = (vp.height - 2200 * mmScale) / 2;
+    mmApply();
+  }
+
+  mmViewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    const newScale = Math.max(0.25, Math.min(2.5, mmScale + delta));
+    const rect = mmViewport.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const ratio = newScale / mmScale;
+    mmTx = mx - (mx - mmTx) * ratio;
+    mmTy = my - (my - mmTy) * ratio;
+    mmScale = newScale;
+    mmApply();
+  }, { passive: false });
+
+  mmViewport.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.sub-node') || e.target.closest('.branch-pill') || e.target.closest('.mm-center')) return;
+    mmDragging = true;
+    mmViewport.classList.add('grabbing');
+    mmSx = e.clientX - mmTx;
+    mmSy = e.clientY - mmTy;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!mmDragging) return;
+    mmTx = e.clientX - mmSx;
+    mmTy = e.clientY - mmSy;
+    mmApply();
+  });
+
+  document.addEventListener('mouseup', () => {
+    mmDragging = false;
+    mmViewport.classList.remove('grabbing');
+  });
+
+  let mmTD = 0, mmTS = 1;
+  mmViewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      mmDragging = true;
+      mmSx = e.touches[0].clientX - mmTx;
+      mmSy = e.touches[0].clientY - mmTy;
+    } else if (e.touches.length === 2) {
+      mmDragging = false;
+      mmTD = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      mmTS = mmScale;
+    }
+  }, { passive: true });
+
+  mmViewport.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1 && mmDragging) {
+      mmTx = e.touches[0].clientX - mmSx;
+      mmTy = e.touches[0].clientY - mmSy;
+      mmApply();
+    } else if (e.touches.length === 2) {
+      const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      mmScale = Math.max(0.25, Math.min(2.5, mmTS * (d / mmTD)));
+      mmApply();
+    }
+  }, { passive: false });
+
+  mmViewport.addEventListener('touchend', () => { mmDragging = false; });
+
+  window.addEventListener('scroll', () => {
+    const top = window.pageYOffset;
+    const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById('progress').style.width = (top / h) * 100 + '%';
+    document.getElementById('btnTopo').classList.toggle('visivel', top > 300);
+  });
+
+  const sections = ['sec-mapa', 'sec-diagrama', 'sec-infograficos', 'sec-referencias'];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.indice-link').forEach(l => {
+          l.classList.toggle('active', l.dataset.section === entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-100px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(mmFit, 250);
+  });
+
+  window.addEventListener('load', () => { setTimeout(mmFit, 250); });
+</script>
+</body>
+</html>
